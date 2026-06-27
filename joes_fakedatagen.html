@@ -1,0 +1,1814 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Schema → Fake Data</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;0,8..60,700;1,8..60,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --black: #111111;
+  --white: #FFFFFF;
+  --paper: #FAFAF8;
+  --gray-1: #444444;
+  --gray-2: #707070;
+  --gray-3: #9A9A9A;
+  --gray-4: #C7C7C2;
+  --gray-5: #E3E2DD;
+  --rule: #1A1A1A;
+  --rule-light: #D8D7D1;
+  --serif: 'Source Serif 4', Georgia, 'Times New Roman', serif;
+  --mono: 'IBM Plex Mono', 'Courier New', monospace;
+}
+
+* { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--black);
+  font-family: var(--serif);
+  -webkit-font-smoothing: antialiased;
+  line-height: 1.5;
+}
+
+::selection { background: var(--black); color: var(--white); }
+
+a { color: var(--black); text-decoration: underline; text-decoration-color: var(--gray-4); text-underline-offset: 2px; }
+a:hover { text-decoration-color: var(--black); }
+
+button:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--black);
+  outline-offset: 2px;
+}
+
+/* ---------------- layout shell ---------------- */
+
+.shell {
+  max-width: 920px;
+  margin: 0 auto;
+  padding: 0 28px 100px;
+}
+
+header.top {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  padding: 48px 0 22px;
+  border-bottom: 3px solid var(--black);
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+  gap: 14px;
+}
+
+.brand .mark {
+  font-family: var(--serif);
+  font-weight: 700;
+  font-size: 28px;
+  letter-spacing: -0.01em;
+  color: var(--black);
+  font-style: italic;
+}
+
+.brand .tag {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-2);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  margin-top: 4px;
+  display: block;
+}
+
+.top-meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-2);
+  letter-spacing: 0.02em;
+  text-align: right;
+  white-space: nowrap;
+}
+
+/* ---------------- section scaffolding ---------------- */
+
+.stage {
+  margin-bottom: 52px;
+}
+
+.stage-head {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.stage-num {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--white);
+  background: var(--black);
+  border-radius: 0;
+  padding: 3px 7px;
+  letter-spacing: 0.02em;
+}
+
+.stage-title {
+  font-family: var(--serif);
+  font-weight: 600;
+  font-size: 21px;
+  color: var(--black);
+  letter-spacing: -0.01em;
+}
+
+.stage-sub {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-2);
+  margin-left: auto;
+  text-align: right;
+}
+
+/* ---------------- input stage ---------------- */
+
+.input-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.input-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 12px;
+  border-bottom: 1px solid var(--rule);
+}
+
+.input-tab {
+  font-family: var(--mono);
+  font-size: 12px;
+  background: transparent;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--gray-2);
+  padding: 8px 16px 10px 0;
+  margin-right: 20px;
+  cursor: pointer;
+  transition: color .15s, border-color .15s;
+}
+.input-tab.active {
+  color: var(--black);
+  border-bottom-color: var(--black);
+}
+.input-tab:hover:not(.active) { color: var(--black); }
+
+#schema-input {
+  width: 100%;
+  min-height: 220px;
+  background: var(--white);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  color: var(--black);
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.65;
+  padding: 18px;
+  resize: vertical;
+  tab-size: 2;
+}
+#schema-input::placeholder { color: var(--gray-3); }
+#schema-input:focus { border-color: var(--black); outline: none; box-shadow: 0 0 0 1px var(--black); }
+
+.dropzone {
+  border: 1px dashed var(--gray-3);
+  border-radius: 0;
+  padding: 36px 16px;
+  text-align: center;
+  color: var(--gray-2);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  transition: border-color .15s, background .15s;
+  display: block;
+}
+.dropzone:hover, .dropzone.dragover {
+  border-color: var(--black);
+  background: var(--gray-5);
+}
+.dropzone strong { color: var(--black); font-family: var(--serif); font-size: 15px; font-weight: 600; }
+.dropzone input[type=file] { display: none; }
+
+.action-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  padding: 12px 22px;
+  border-radius: 0;
+  border: 1px solid var(--black);
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background .15s, color .15s;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary {
+  background: var(--black);
+  color: var(--white);
+}
+.btn-primary:hover { background: var(--gray-1); }
+.btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  border-color: var(--gray-4);
+  color: var(--gray-1);
+}
+.btn-ghost:hover { border-color: var(--black); color: var(--black); }
+
+.sample-link {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-2);
+  margin-left: auto;
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--gray-4);
+}
+.sample-link:hover { color: var(--black); text-decoration-color: var(--black); }
+
+.error-box {
+  display: none;
+  margin-top: 16px;
+  background: var(--white);
+  border: 1px solid var(--black);
+  border-left: 4px solid var(--black);
+  border-radius: 0;
+  padding: 13px 16px;
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--black);
+}
+
+/* ---------------- schema map (parsed structure) ---------------- */
+
+#schema-map-section { display: none; }
+
+.table-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 0;
+  border: 1px solid var(--rule);
+  border-right: none;
+  border-bottom: none;
+}
+
+.table-card {
+  background: var(--white);
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  overflow: hidden;
+}
+
+.table-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--rule);
+  background: var(--black);
+}
+
+.table-card-head .name {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 13px;
+  color: var(--white);
+}
+
+.table-card-head .count {
+  font-family: var(--mono);
+  font-size: 10px;
+  color: var(--gray-4);
+}
+
+.col-list {
+  padding: 4px 0;
+}
+
+.col-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  font-family: var(--mono);
+  font-size: 12px;
+  border-bottom: 1px solid var(--rule-light);
+}
+.col-row:last-child { border-bottom: none; }
+
+.col-row .col-name { color: var(--black); flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.col-row .col-type { color: var(--gray-2); font-size: 11px; white-space: nowrap; }
+
+.badge {
+  font-family: var(--mono);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  padding: 1px 5px;
+  border-radius: 0;
+  white-space: nowrap;
+  border: 1px solid var(--black);
+}
+.badge-pk { background: var(--black); color: var(--white); }
+.badge-fk { background: var(--white); color: var(--black); text-decoration: underline; text-decoration-style: dotted; }
+
+/* ---------------- row count controls ---------------- */
+
+.count-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 0;
+  margin-bottom: 4px;
+  border: 1px solid var(--rule);
+  border-right: none;
+  border-bottom: none;
+}
+
+.count-card {
+  background: var(--white);
+  border-right: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 13px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.count-card .label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--black);
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.count-card input[type=number] {
+  width: 64px;
+  background: var(--paper);
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  color: var(--black);
+  font-family: var(--mono);
+  font-size: 13px;
+  text-align: center;
+  padding: 6px 4px;
+}
+.count-card input[type=number]:focus { border-color: var(--black); outline: none; }
+
+/* ---------------- output stage ---------------- */
+
+#output-section { display: none; }
+
+.output-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.format-pills {
+  display: flex;
+  gap: 0;
+  border: 1px solid var(--black);
+}
+.format-pill {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 8px 16px;
+  border-radius: 0;
+  background: var(--white);
+  border: none;
+  border-right: 1px solid var(--black);
+  color: var(--gray-1);
+  cursor: pointer;
+}
+.format-pill:last-child { border-right: none; }
+.format-pill.active { background: var(--black); color: var(--white); }
+.format-pill:hover:not(.active) { background: var(--gray-5); }
+
+.output-table-block {
+  margin-bottom: 32px;
+  border: 1px solid var(--rule);
+  border-radius: 0;
+  overflow: hidden;
+}
+
+.output-table-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 13px 16px;
+  background: var(--black);
+  border-bottom: 1px solid var(--rule);
+}
+.output-table-head .name {
+  font-family: var(--mono);
+  font-weight: 600;
+  font-size: 14px;
+  color: var(--white);
+}
+.output-table-head .meta {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-4);
+}
+.copy-btn {
+  font-family: var(--mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 1px solid var(--gray-4);
+  color: var(--gray-4);
+  padding: 5px 10px;
+  border-radius: 0;
+  cursor: pointer;
+}
+.copy-btn:hover { border-color: var(--white); color: var(--white); }
+
+.table-scroll {
+  overflow-x: auto;
+  max-height: 440px;
+  overflow-y: auto;
+  background: var(--white);
+}
+
+table.data-preview {
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--mono);
+  font-size: 12px;
+}
+table.data-preview th {
+  text-align: left;
+  padding: 9px 12px;
+  background: var(--gray-5);
+  color: var(--gray-1);
+  font-weight: 600;
+  white-space: nowrap;
+  position: sticky;
+  top: 0;
+  border-bottom: 1px solid var(--rule);
+  border-right: 1px solid var(--rule-light);
+}
+table.data-preview th.is-pk { text-decoration: underline; text-decoration-thickness: 2px; }
+table.data-preview th.is-fk { text-decoration: underline; text-decoration-style: dotted; }
+table.data-preview td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--rule-light);
+  border-right: 1px solid var(--rule-light);
+  white-space: nowrap;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--black);
+}
+table.data-preview td.is-pk { font-weight: 600; }
+table.data-preview td.is-fk { text-decoration: underline; text-decoration-style: dotted; text-decoration-color: var(--gray-3); }
+table.data-preview td.is-null { color: var(--gray-3); font-style: italic; }
+table.data-preview tr:hover td { background: var(--gray-5); }
+
+pre.code-output {
+  margin: 0;
+  padding: 18px;
+  font-family: var(--mono);
+  font-size: 12px;
+  line-height: 1.65;
+  color: var(--black);
+  background: var(--white);
+  overflow-x: auto;
+  max-height: 440px;
+  white-space: pre;
+}
+
+.export-row {
+  display: flex;
+  gap: 10px;
+  margin-top: 24px;
+  flex-wrap: wrap;
+}
+
+footer.site-footer {
+  margin-top: 64px;
+  padding-top: 20px;
+  border-top: 3px solid var(--black);
+  font-family: var(--mono);
+  font-size: 11px;
+  color: var(--gray-2);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* ---------------- toast ---------------- */
+
+.toast {
+  position: fixed;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: var(--black);
+  color: var(--white);
+  font-family: var(--mono);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 11px 20px;
+  border-radius: 0;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .2s, transform .2s;
+  z-index: 100;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); pointer-events: auto; }
+
+/* ---------------- responsive ---------------- */
+
+@media (max-width: 640px) {
+  .shell { padding: 0 18px 70px; }
+  header.top { padding: 32px 0 18px; }
+  .brand { flex-direction: column; align-items: flex-start; gap: 2px; }
+  .top-meta { text-align: left; }
+  .stage-head { flex-wrap: wrap; }
+  .stage-sub { margin-left: 0; width: 100%; text-align: left; }
+  .output-toolbar { flex-direction: column; align-items: stretch; }
+  .format-pills { overflow-x: auto; }
+  .action-row { flex-direction: column; align-items: stretch; }
+  .action-row .btn { width: 100%; text-align: center; }
+  .action-row label { margin-left: 0 !important; justify-content: space-between; width: 100%; }
+  .sample-link { margin-left: 0; text-align: left; }
+  .table-grid, .count-grid { grid-template-columns: 1fr; }
+  #schema-input { min-height: 180px; font-size: 12px; }
+  table.data-preview td, table.data-preview th { padding: 6px 10px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+
+  <header class="top">
+    <div class="brand">
+      <span class="mark">Schema → Data</span>
+      <span class="tag">fake data generator, run locally</span>
+    </div>
+    <div class="top-meta" id="run-meta">no schema loaded</div>
+  </header>
+
+  <!-- STAGE 1: INPUT -->
+  <section class="stage" id="input-stage">
+    <div class="stage-head">
+      <span class="stage-num">01</span>
+      <span class="stage-title">Give it a schema</span>
+      <span class="stage-sub">CREATE TABLE statements — any dialect</span>
+    </div>
+
+    <div class="input-grid">
+      <div class="input-tabs">
+        <button class="input-tab active" data-tab="paste">Paste SQL</button>
+        <button class="input-tab" data-tab="upload">Upload file</button>
+      </div>
+
+      <div id="tab-paste">
+        <textarea id="schema-input" placeholder="CREATE TABLE customers (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(50) NOT NULL,
+  email VARCHAR(255) UNIQUE NOT NULL,
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE orders (
+  id INT PRIMARY KEY,
+  customer_id INT REFERENCES customers(id),
+  total DECIMAL(10,2)
+);"></textarea>
+      </div>
+
+      <div id="tab-upload" style="display:none;">
+        <label class="dropzone" id="dropzone">
+          <input type="file" id="file-input" accept=".sql,.txt">
+          <div><strong>Drop a .sql file</strong> or click to browse</div>
+          <div style="margin-top:4px;">Reads CREATE TABLE statements from any export or migration file</div>
+        </label>
+      </div>
+
+      <div class="action-row">
+        <button class="btn btn-primary" id="parse-btn">Parse schema →</button>
+        <button class="btn btn-ghost" id="clear-btn">Clear</button>
+        <span class="sample-link" id="sample-link">load a sample e-commerce schema</span>
+      </div>
+
+      <div class="error-box" id="error-box"></div>
+    </div>
+  </section>
+
+  <!-- STAGE 2: SCHEMA MAP -->
+  <section class="stage" id="schema-map-section">
+    <div class="stage-head">
+      <span class="stage-num">02</span>
+      <span class="stage-title">Structure detected</span>
+      <span class="stage-sub" id="schema-summary"></span>
+    </div>
+    <div class="table-grid" id="table-grid"></div>
+  </section>
+
+  <!-- STAGE 3: ROW COUNTS -->
+  <section class="stage" id="counts-section" style="display:none;">
+    <div class="stage-head">
+      <span class="stage-num">03</span>
+      <span class="stage-title">How many rows per table</span>
+      <span class="stage-sub">parent tables generate first, so foreign keys always resolve</span>
+    </div>
+    <div class="count-grid" id="count-grid"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="generate-btn">Generate fake data →</button>
+      <label style="font-family:var(--mono);font-size:12px;color:var(--gray-2);display:flex;align-items:center;gap:6px;margin-left:8px;">
+        seed <input type="number" id="seed-input" value="42" style="width:64px;background:var(--paper);border:1px solid var(--rule);border-radius:0;color:var(--black);font-family:var(--mono);font-size:12px;text-align:center;padding:6px 4px;">
+      </label>
+      <span class="sample-link" id="reroll-link" style="display:none;">↻ re-roll with new seed</span>
+    </div>
+  </section>
+
+  <!-- STAGE 4: OUTPUT -->
+  <section class="stage" id="output-section">
+    <div class="stage-head">
+      <span class="stage-num">04</span>
+      <span class="stage-title">Generated data</span>
+      <span class="stage-sub" id="output-summary"></span>
+    </div>
+
+    <div class="output-toolbar">
+      <div class="format-pills">
+        <button class="format-pill active" data-format="table">Preview</button>
+        <button class="format-pill" data-format="sql">SQL</button>
+        <button class="format-pill" data-format="json">JSON</button>
+        <button class="format-pill" data-format="csv">CSV</button>
+      </div>
+    </div>
+
+    <div id="output-tables"></div>
+  </section>
+
+  <footer class="site-footer">
+    <span>runs entirely in your browser — nothing is uploaded</span>
+    <span id="footer-right">jcrutsinger.com</span>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* ====================== ENGINE (inlined) ====================== */
+/* ============================================================
+   SCHEMA PARSER + FAKE DATA ENGINE
+   Parses CREATE TABLE SQL (MySQL/Postgres/SQLite/SQL Server-ish
+   dialects) into a structural model, then generates referentially
+   consistent fake data.
+   ============================================================ */
+
+// ---------- 1. TOKENIZE / SPLIT STATEMENTS ----------
+
+function splitStatements(sql) {
+  // Remove comments
+  sql = sql.replace(/--.*$/gm, '');
+  sql = sql.replace(/\/\*[\s\S]*?\*\//g, '');
+
+  const statements = [];
+  let depth = 0, current = '', inString = false, stringChar = '';
+  for (let i = 0; i < sql.length; i++) {
+    const c = sql[i];
+    if (inString) {
+      current += c;
+      if (c === stringChar && sql[i - 1] !== '\\') inString = false;
+      continue;
+    }
+    if (c === "'" || c === '"' || c === '`') {
+      inString = true; stringChar = c; current += c; continue;
+    }
+    if (c === '(') depth++;
+    if (c === ')') depth--;
+    if (c === ';' && depth === 0) {
+      statements.push(current.trim());
+      current = '';
+      continue;
+    }
+    current += c;
+  }
+  if (current.trim()) statements.push(current.trim());
+  return statements.filter(Boolean);
+}
+
+// ---------- 2. PARSE CREATE TABLE ----------
+
+function parseSchema(sqlText) {
+  const statements = splitStatements(sqlText);
+  const tables = {};
+  const order = [];
+
+  for (const stmt of statements) {
+    const m = stmt.match(/CREATE\s+TABLE\s+(?:IF\s+NOT\s+EXISTS\s+)?[`"\[]?([a-zA-Z0-9_.]+)[`"\]]?\s*\(/i);
+    if (!m) continue;
+    const tableName = m[1].split('.').pop();
+    const openIdx = stmt.indexOf('(', m.index);
+    const body = extractBalanced(stmt, openIdx);
+    const cols = splitTopLevel(body);
+
+    const table = { name: tableName, columns: [], primaryKey: [], foreignKeys: [], uniques: [] };
+
+    for (let raw of cols) {
+      raw = raw.trim();
+      if (!raw) continue;
+      const upper = raw.toUpperCase();
+
+      if (upper.startsWith('PRIMARY KEY')) {
+        const pkCols = extractParenList(raw);
+        table.primaryKey.push(...pkCols);
+        continue;
+      }
+      if (upper.startsWith('FOREIGN KEY') || upper.startsWith('CONSTRAINT')) {
+        const fk = parseForeignKey(raw);
+        if (fk) table.foreignKeys.push(fk);
+        continue;
+      }
+      if (upper.startsWith('UNIQUE')) {
+        const uCols = extractParenList(raw);
+        if (uCols.length) table.uniques.push(uCols);
+        continue;
+      }
+      if (upper.startsWith('CHECK')) {
+        const colCheckMatch = raw.match(/CHECK\s*\(\s*[`"\[]?([a-zA-Z0-9_]+)[`"\]]?\s+IN\s*\(([^)]+)\)/i);
+        if (colCheckMatch) {
+          table._tableChecks = table._tableChecks || {};
+          table._tableChecks[colCheckMatch[1]] = colCheckMatch[2].split(',').map(s => s.trim().replace(/^'|'$/g, ''));
+        }
+        continue;
+      }
+      if (upper.startsWith('INDEX') || upper.startsWith('KEY ')) {
+        continue;
+      }
+
+      const col = parseColumnDef(raw);
+      if (col) table.columns.push(col);
+    }
+
+    // inline PRIMARY KEY / REFERENCES / UNIQUE on column defs
+    for (const col of table.columns) {
+      if (col._inlinePK) table.primaryKey.push(col.name);
+      if (col._inlineUnique) table.uniques.push([col.name]);
+      if (col._inlineRef) {
+        table.foreignKeys.push({
+          columns: [col.name],
+          refTable: col._inlineRef.table,
+          refColumns: [col._inlineRef.column || 'id']
+        });
+      }
+    }
+    if (table._tableChecks) {
+      for (const col of table.columns) {
+        if (table._tableChecks[col.name]) {
+          col.category = { kind: 'enum', options: table._tableChecks[col.name] };
+        }
+      }
+    }
+
+    tables[tableName] = table;
+    order.push(tableName);
+  }
+
+  // If no explicit PK found but a column named id / <table>_id exists, infer it
+  for (const t of Object.values(tables)) {
+    if (t.primaryKey.length === 0) {
+      const idCol = t.columns.find(c => /^id$/i.test(c.name)) ||
+                    t.columns.find(c => c.isPK);
+      if (idCol) t.primaryKey = [idCol.name];
+    }
+    // mark PK columns
+    for (const c of t.columns) {
+      c.isPK = t.primaryKey.includes(c.name);
+    }
+    // mark FK columns
+    for (const fk of t.foreignKeys) {
+      for (const colName of fk.columns) {
+        const c = t.columns.find(cc => cc.name === colName);
+        if (c) { c.isFK = true; c.fkRef = { table: fk.refTable, column: fk.refColumns[0] }; }
+      }
+    }
+  }
+
+  return { tables, order: topoSort(tables, order) };
+}
+
+function extractBalanced(str, openIdx) {
+  let depth = 0, i = openIdx;
+  for (; i < str.length; i++) {
+    if (str[i] === '(') depth++;
+    if (str[i] === ')') { depth--; if (depth === 0) break; }
+  }
+  return str.slice(openIdx + 1, i);
+}
+
+function splitTopLevel(str) {
+  const parts = [];
+  let depth = 0, current = '', inString = false, stringChar = '';
+  for (let i = 0; i < str.length; i++) {
+    const c = str[i];
+    if (inString) {
+      current += c;
+      if (c === stringChar) inString = false;
+      continue;
+    }
+    if (c === "'" || c === '"' || c === '`') { inString = true; stringChar = c; current += c; continue; }
+    if (c === '(') depth++;
+    if (c === ')') depth--;
+    if (c === ',' && depth === 0) { parts.push(current); current = ''; continue; }
+    current += c;
+  }
+  if (current.trim()) parts.push(current);
+  return parts;
+}
+
+function extractParenList(str) {
+  const m = str.match(/\(([^)]+)\)/);
+  if (!m) return [];
+  return m[1].split(',').map(s => s.trim().replace(/[`"\[\]]/g, ''));
+}
+
+function parseForeignKey(raw) {
+  // CONSTRAINT fk_name FOREIGN KEY (col) REFERENCES table (col2)
+  const fkMatch = raw.match(/FOREIGN\s+KEY\s*\(([^)]+)\)\s*REFERENCES\s+[`"\[]?([a-zA-Z0-9_.]+)[`"\]]?\s*\(([^)]+)\)/i);
+  if (!fkMatch) return null;
+  const columns = fkMatch[1].split(',').map(s => s.trim().replace(/[`"\[\]]/g, ''));
+  const refTable = fkMatch[2].split('.').pop();
+  const refColumns = fkMatch[3].split(',').map(s => s.trim().replace(/[`"\[\]]/g, ''));
+  return { columns, refTable, refColumns };
+}
+
+function parseColumnDef(raw) {
+  raw = raw.trim();
+  // name can be quoted
+  const nameMatch = raw.match(/^[`"\[]?([a-zA-Z0-9_]+)[`"\]]?\s+(.+)$/s);
+  if (!nameMatch) return null;
+  const name = nameMatch[1];
+  let rest = nameMatch[2];
+
+  // type: word optionally followed by (n) or (n,m), optionally [] for arrays, possibly multi-word (e.g. "double precision", "character varying")
+  const typeMatch = rest.match(/^([a-zA-Z][a-zA-Z0-9_]*(?:\s+(?:precision|varying|without\s+time\s+zone|with\s+time\s+zone))?)\s*(\([^)]*\))?/i);
+  let dataType = typeMatch ? typeMatch[1].toLowerCase() : 'text';
+  let typeArgs = typeMatch && typeMatch[2] ? typeMatch[2].replace(/[()]/g, '').split(',').map(s => s.trim()) : [];
+  rest = rest.slice(typeMatch ? typeMatch[0].length : 0);
+
+  const upperRest = rest.toUpperCase();
+  const col = {
+    name,
+    rawType: dataType,
+    typeArgs,
+    notNull: /NOT\s+NULL/i.test(rest),
+    isPK: false,
+    isFK: false,
+    isUnique: /\bUNIQUE\b/i.test(rest),
+    autoIncrement: /AUTO_INCREMENT|AUTOINCREMENT|IDENTITY|SERIAL/i.test(rest) || /SERIAL/i.test(dataType),
+    default: null,
+    _inlinePK: /PRIMARY\s+KEY/i.test(rest),
+    _inlineUnique: /\bUNIQUE\b/i.test(rest),
+    _inlineRef: null,
+  };
+
+  const defMatch = rest.match(/DEFAULT\s+('(?:[^']|'')*'|[^\s,]+)/i);
+  if (defMatch) col.default = defMatch[1].replace(/^'|'$/g, '');
+
+  const checkMatch = rest.match(/CHECK\s*\(\s*(?:[`"\[]?[a-zA-Z0-9_]+[`"\]]?\s+)?IN\s*\(([^)]+)\)/i);
+  if (checkMatch) {
+    col._checkValues = checkMatch[1].split(',').map(s => s.trim().replace(/^'|'$/g, ''));
+  }
+
+  const refMatch = rest.match(/REFERENCES\s+[`"\[]?([a-zA-Z0-9_.]+)[`"\]]?\s*(?:\(([^)]+)\))?/i);
+  if (refMatch) {
+    col._inlineRef = { table: refMatch[1].split('.').pop(), column: refMatch[2] ? refMatch[2].trim().replace(/[`"\[\]]/g, '') : null };
+  }
+
+  col.category = classifyType(dataType, typeArgs, name);
+  if (col._checkValues && col._checkValues.length) {
+    col.category = { kind: 'enum', options: col._checkValues };
+  }
+  return col;
+}
+
+function classifyType(rawType, typeArgs, colName) {
+  const t = rawType.toLowerCase();
+  const n = colName.toLowerCase();
+
+  if (/^(serial|bigserial|smallserial)$/.test(t)) return { kind: 'integer', semantic: 'id' };
+  if (/^(int|integer|bigint|smallint|tinyint|mediumint)$/.test(t)) {
+    if (/^id$|_id$/.test(n)) return { kind: 'integer', semantic: 'id' };
+    if (/age$/.test(n)) return { kind: 'integer', semantic: 'age' };
+    if (/qty|quantity|count|stock|inventory/.test(n)) return { kind: 'integer', semantic: 'quantity' };
+    if (/year$/.test(n)) return { kind: 'integer', semantic: 'year' };
+    if (/rating|stars?$|score/.test(n)) return { kind: 'integer', semantic: 'rating' };
+    return { kind: 'integer', semantic: 'generic' };
+  }
+  if (/^(decimal|numeric|float|double|real|money)/.test(t)) {
+    if (/price|cost|amount|total|balance|salary|fee|revenue/.test(n)) return { kind: 'decimal', semantic: 'money', args: typeArgs };
+    if (/lat/.test(n)) return { kind: 'decimal', semantic: 'lat', args: typeArgs };
+    if (/lon|lng/.test(n)) return { kind: 'decimal', semantic: 'lon', args: typeArgs };
+    if (/rate|percent|ratio/.test(n)) return { kind: 'decimal', semantic: 'percent', args: typeArgs };
+    return { kind: 'decimal', semantic: 'generic', args: typeArgs };
+  }
+  if (/^(bool|boolean)$/.test(t)) return { kind: 'boolean' };
+  if (/^(date)$/.test(t)) return { kind: 'date' };
+  if (/^(timestamp|datetime)/.test(t)) {
+    if (/created/.test(n)) return { kind: 'datetime', semantic: 'created' };
+    if (/updated|modified/.test(n)) return { kind: 'datetime', semantic: 'updated' };
+    if (/deleted/.test(n)) return { kind: 'datetime', semantic: 'deleted_nullable' };
+    return { kind: 'datetime', semantic: 'generic' };
+  }
+  if (/^time$/.test(t)) return { kind: 'time' };
+  if (/^(uuid|guid|uniqueidentifier)$/.test(t)) return { kind: 'uuid' };
+  if (/^(json|jsonb)$/.test(t)) return { kind: 'json' };
+
+  if (/^(varchar|char|character|text|nvarchar|nchar|string|clob|tinytext|mediumtext|longtext)/.test(t)) {
+    const maxLen = typeArgs[0] ? parseInt(typeArgs[0], 10) : null;
+    if (/email/.test(n)) return { kind: 'string', semantic: 'email', maxLen };
+    if (/^(first_?name|fname|given_?name)/.test(n)) return { kind: 'string', semantic: 'firstName', maxLen };
+    if (/^(last_?name|lname|surname|family_?name)/.test(n)) return { kind: 'string', semantic: 'lastName', maxLen };
+    if (/^(full_?name|display_?name)$/.test(n)) return { kind: 'string', semantic: 'fullName', maxLen };
+    if (/^name$/.test(n)) return { kind: 'string', semantic: 'genericName', maxLen };
+    if (/username|user_?login|handle/.test(n)) return { kind: 'string', semantic: 'username', maxLen };
+    if (/phone|mobile|cell/.test(n)) return { kind: 'string', semantic: 'phone', maxLen };
+    if (/^(address|street)/.test(n)) return { kind: 'string', semantic: 'street', maxLen };
+    if (/^city$/.test(n)) return { kind: 'string', semantic: 'city', maxLen };
+    if (/^(state|province)$/.test(n)) return { kind: 'string', semantic: 'state', maxLen };
+    if (/^country$/.test(n)) return { kind: 'string', semantic: 'country', maxLen };
+    if (/^(zip|postal)/.test(n)) return { kind: 'string', semantic: 'zip', maxLen };
+    if (/url|link|website|domain/.test(n)) return { kind: 'string', semantic: 'url', maxLen };
+    if (/slug/.test(n)) return { kind: 'string', semantic: 'slug', maxLen };
+    if (/job_?title|^role$|^position$|occupation/.test(n)) return { kind: 'string', semantic: 'jobTitle', maxLen };
+    if (/title$/.test(n)) return { kind: 'string', semantic: 'title', maxLen };
+    if (/description|bio|summary|notes?$|comment/.test(n)) return { kind: 'string', semantic: 'paragraph', maxLen };
+    if (/password|pwd|hash/.test(n)) return { kind: 'string', semantic: 'hash', maxLen };
+    if (/status|state$/.test(n)) return { kind: 'string', semantic: 'status', maxLen };
+    if (/code$/.test(n)) return { kind: 'string', semantic: 'code', maxLen };
+    if (/color|colour/.test(n)) return { kind: 'string', semantic: 'color', maxLen };
+    if (/sku/.test(n)) return { kind: 'string', semantic: 'sku', maxLen };
+    if (/company|organization|employer/.test(n)) return { kind: 'string', semantic: 'company', maxLen };
+    if (/^ip(_address)?$/.test(n)) return { kind: 'string', semantic: 'ip', maxLen };
+    if (/^category|category$|^type$|^kind$/.test(n)) return { kind: 'string', semantic: 'category', maxLen };
+    if (/^gender|^sex$/.test(n)) return { kind: 'string', semantic: 'gender', maxLen };
+    if (/^(department|dept)$/.test(n)) return { kind: 'string', semantic: 'department', maxLen };
+    return { kind: 'string', semantic: 'generic', maxLen };
+  }
+  if (/^(enum|set)$/.test(t)) return { kind: 'enum', options: typeArgs.map(s => s.replace(/^'|'$/g, '')) };
+  if (/^(blob|bytea|binary|varbinary)/.test(t)) return { kind: 'binary' };
+
+  return { kind: 'string', semantic: 'generic', maxLen: null };
+}
+
+// topological sort so parent tables generate before children
+function topoSort(tables, order) {
+  const visited = new Set();
+  const result = [];
+  function visit(name) {
+    if (visited.has(name) || !tables[name]) return;
+    visited.add(name);
+    for (const fk of tables[name].foreignKeys) {
+      if (fk.refTable !== name) visit(fk.refTable);
+    }
+    result.push(name);
+  }
+  for (const name of order) visit(name);
+  return result;
+}
+
+
+/* ====================== GENERATOR (inlined) ====================== */
+/* ============================================================
+   FAKE DATA GENERATOR
+   Consumes the parsed schema model (from engine.js) and produces
+   rows per table, respecting types, constraints, and FK integrity.
+   No external dependencies - self-contained word lists.
+   ============================================================ */
+
+// ---------- Seeded PRNG (Mulberry32) for reproducible runs ----------
+function makeRng(seed) {
+  let a = seed >>> 0;
+  return function () {
+    a |= 0; a = (a + 0x6D2B79F5) | 0;
+    let t = Math.imul(a ^ (a >>> 15), 1 | a);
+    t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
+const WORDLISTS = {
+  firstNames: ["James","Mary","Robert","Patricia","John","Jennifer","Michael","Linda","David","Elizabeth",
+    "William","Barbara","Richard","Susan","Joseph","Jessica","Thomas","Sarah","Charles","Karen",
+    "Christopher","Nancy","Daniel","Lisa","Matthew","Margaret","Anthony","Betty","Mark","Sandra",
+    "Donald","Ashley","Steven","Kimberly","Andrew","Emily","Paul","Donna","Joshua","Michelle",
+    "Kenneth","Carol","Kevin","Amanda","Brian","Melissa","George","Deborah","Edward","Stephanie",
+    "Wei","Mei","Yuki","Hiro","Carlos","Sofia","Liam","Olivia","Noah","Emma","Aiden","Ava","Mateo","Isla"],
+  lastNames: ["Smith","Johnson","Williams","Brown","Jones","Garcia","Miller","Davis","Rodriguez","Martinez",
+    "Hernandez","Lopez","Gonzalez","Wilson","Anderson","Thomas","Taylor","Moore","Jackson","Martin",
+    "Lee","Perez","Thompson","White","Harris","Sanchez","Clark","Ramirez","Lewis","Robinson",
+    "Walker","Young","Allen","King","Wright","Scott","Torres","Nguyen","Hill","Flores","Green",
+    "Adams","Nelson","Baker","Hall","Rivera","Campbell","Mitchell","Carter","Roberts"],
+  streetNames: ["Maple","Oak","Cedar","Pine","Elm","Washington","Lake","Hill","Park","Sunset",
+    "River","Highland","Forest","Meadow","Spring","Church","Main","Birch","Willow","Ridge"],
+  streetTypes: ["St","Ave","Blvd","Dr","Ln","Rd","Way","Ct","Pl","Ter"],
+  cities: ["Springfield","Riverside","Franklin","Greenville","Bristol","Clinton","Salem","Madison",
+    "Georgetown","Arlington","Ashland","Burlington","Cleveland","Dover","Fairview","Hudson",
+    "Jackson","Kingston","Lexington","Manchester","Newport","Oakland","Plymouth","Riverton","Troy"],
+  states: ["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA",
+    "ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR",
+    "PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"],
+  countries: ["United States","Canada","United Kingdom","Germany","France","Australia","Japan",
+    "Brazil","India","Mexico","Spain","Italy","Netherlands","Sweden","Singapore","South Korea"],
+  companies: ["Acme","Globex","Initech","Umbrella","Stark Industries","Wayne Enterprises","Hooli",
+    "Vandelay Industries","Cyberdyne","Wonka Industries","Massive Dynamic","Soylent Corp",
+    "Northwind Traders","Contoso","Fabrikam","Tyrell Corp","Aperture Science","Pied Piper"],
+  companySuffixes: ["Inc","LLC","Group","Co","Ltd","Holdings","Partners","Solutions","Technologies"],
+  domains: ["example.com","mail.com","test.org","demo.net","sample.io","placeholder.dev"],
+  adjectives: ["Quick","Bright","Silent","Bold","Gentle","Sharp","Calm","Swift","Brave","Wise",
+    "Fresh","Smart","Solid","Prime","Royal","Cosmic","Hidden","Golden","Crimson","Azure"],
+  nouns: ["Falcon","River","Summit","Forge","Anchor","Beacon","Harbor","Orbit","Pixel","Cipher",
+    "Nimbus","Quartz","Vertex","Atlas","Comet","Lantern","Voyager","Echo","Drift","Spark"],
+  productNouns: ["Widget","Gadget","Backpack","Headphones","Keyboard","Monitor","Lamp","Chair",
+    "Notebook","Bottle","Speaker","Charger","Bicycle","Camera","Blender","Toaster","Jacket","Boots"],
+  loremWords: ["lorem","ipsum","dolor","sit","amet","consectetur","adipiscing","elit","sed","do",
+    "eiusmod","tempor","incididunt","ut","labore","et","dolore","magna","aliqua","enim","ad",
+    "minim","veniam","quis","nostrud","exercitation","ullamco","laboris","nisi","aliquip","ex",
+    "ea","commodo","consequat","duis","aute","irure","in","reprehenderit","voluptate","velit",
+    "esse","cillum","fugiat","nulla","pariatur","excepteur","sint","occaecat","cupidatat"],
+  statuses: ["pending","active","completed","cancelled","shipped","delivered","processing","failed","draft","archived"],
+  colors: ["red","blue","green","yellow","black","white","gray","orange","purple","teal","navy","maroon"],
+  categories: ["Electronics","Clothing","Home & Garden","Sports","Books","Toys","Food & Beverage","Health","Automotive","Office"],
+};
+
+function pick(rng, arr) { return arr[Math.floor(rng() * arr.length)]; }
+function intBetween(rng, min, max) { return Math.floor(rng() * (max - min + 1)) + min; }
+function floatBetween(rng, min, max, decimals) {
+  const v = rng() * (max - min) + min;
+  return Number(v.toFixed(decimals));
+}
+function decimalLiteral(rng, min, max, decimals) {
+  const v = rng() * (max - min) + min;
+  return v.toFixed(decimals); // string preserves trailing zeros, matches DB decimal display
+}
+function pad(n, len) { return String(n).padStart(len, '0'); }
+
+function titleCase(words, count) {
+  const out = [];
+  for (let i = 0; i < count; i++) out.push(pick.callerWordlist ? '' : '');
+  return out;
+}
+
+function genUUID(rng) {
+  const hex = () => Math.floor(rng() * 16).toString(16);
+  let s = '';
+  for (let i = 0; i < 32; i++) s += hex();
+  return `${s.slice(0,8)}-${s.slice(8,12)}-4${s.slice(13,16)}-a${s.slice(17,20)}-${s.slice(20,32)}`;
+}
+
+function randomDateBetween(rng, start, end) {
+  const t = start.getTime() + rng() * (end.getTime() - start.getTime());
+  return new Date(t);
+}
+
+function fmtDate(d) {
+  return d.toISOString().slice(0, 10);
+}
+function fmtDateTime(d) {
+  return d.toISOString().slice(0, 19).replace('T', ' ');
+}
+function fmtTime(d) {
+  return d.toISOString().slice(11, 19);
+}
+
+function truncate(str, maxLen) {
+  if (!maxLen) return str;
+  return str.length > maxLen ? str.slice(0, maxLen) : str;
+}
+
+// ---------- Value generators per semantic category ----------
+
+function generateValue(col, ctx) {
+  const { rng, rowIndex, table, allTables, generatedRows } = ctx;
+  const cat = col.category;
+
+  // Nullable columns: occasionally emit null (10% chance) unless NOT NULL/PK
+  const canBeNull = !col.notNull && !col.isPK;
+  if (canBeNull && cat.semantic !== 'deleted_nullable' && rng() < 0.08) {
+    return null;
+  }
+  if (cat.semantic === 'deleted_nullable') {
+    return rng() < 0.85 ? null : fmtDateTime(randomDateBetween(rng, new Date(2023,0,1), new Date()));
+  }
+
+  switch (cat.kind) {
+    case 'integer': {
+      if (col.isPK) return rowIndex + 1;
+      switch (cat.semantic) {
+        case 'age': return intBetween(rng, 18, 85);
+        case 'quantity': return intBetween(rng, 0, 500);
+        case 'year': return intBetween(rng, 2015, 2026);
+        case 'rating': return intBetween(rng, 1, 5);
+        default: return intBetween(rng, 1, 10000);
+      }
+    }
+    case 'decimal': {
+      const decimals = (cat.args && cat.args[1]) ? parseInt(cat.args[1], 10) : 2;
+      switch (cat.semantic) {
+        case 'money': return decimalLiteral(rng, 1, 2500, decimals);
+        case 'lat': return decimalLiteral(rng, -90, 90, Math.min(decimals, 6) || 6);
+        case 'lon': return decimalLiteral(rng, -180, 180, Math.min(decimals, 6) || 6);
+        case 'percent': return decimalLiteral(rng, 0, 100, decimals);
+        default: return decimalLiteral(rng, 0, 1000, decimals);
+      }
+    }
+    case 'boolean':
+      return rng() < 0.5 ? true : false;
+    case 'date': {
+      const d = randomDateBetween(rng, new Date(2018, 0, 1), new Date());
+      return fmtDate(d);
+    }
+    case 'datetime': {
+      let d;
+      if (cat.semantic === 'created') d = randomDateBetween(rng, new Date(2020, 0, 1), new Date());
+      else if (cat.semantic === 'updated') d = randomDateBetween(rng, new Date(2023, 0, 1), new Date());
+      else d = randomDateBetween(rng, new Date(2018, 0, 1), new Date());
+      return fmtDateTime(d);
+    }
+    case 'time': {
+      const d = randomDateBetween(rng, new Date(2020,0,1,0,0,0), new Date(2020,0,1,23,59,59));
+      return fmtTime(d);
+    }
+    case 'uuid':
+      return genUUID(rng);
+    case 'json':
+      return JSON.stringify({ key: pick(rng, WORDLISTS.nouns).toLowerCase(), value: intBetween(rng, 1, 100) });
+    case 'binary':
+      return '0x' + Array.from({length: 8}, () => Math.floor(rng()*16).toString(16)).join('');
+    case 'enum': {
+      if (cat.options && cat.options.length) return pick(rng, cat.options);
+      return pick(rng, WORDLISTS.statuses);
+    }
+    case 'string':
+      return truncate(generateString(cat.semantic, rng, ctx), cat.maxLen);
+    default:
+      return truncate(generateString('generic', rng, ctx), cat.maxLen);
+  }
+}
+
+function generateString(semantic, rng, ctx) {
+  switch (semantic) {
+    case 'firstName': return pick(rng, WORDLISTS.firstNames);
+    case 'lastName': return pick(rng, WORDLISTS.lastNames);
+    case 'fullName': return `${pick(rng, WORDLISTS.firstNames)} ${pick(rng, WORDLISTS.lastNames)}`;
+    case 'genericName': {
+      // could be person or product depending on table context
+      if (/product|item|sku/i.test(ctx.table.name)) {
+        return `${pick(rng, WORDLISTS.adjectives)} ${pick(rng, WORDLISTS.productNouns)}`;
+      }
+      return `${pick(rng, WORDLISTS.adjectives)} ${pick(rng, WORDLISTS.nouns)}`;
+    }
+    case 'username': {
+      const fn = pick(rng, WORDLISTS.firstNames).toLowerCase();
+      const ln = pick(rng, WORDLISTS.lastNames).toLowerCase();
+      return `${fn}.${ln}${intBetween(rng, 1, 999)}`;
+    }
+    case 'email': {
+      const fn = pick(rng, WORDLISTS.firstNames).toLowerCase();
+      const ln = pick(rng, WORDLISTS.lastNames).toLowerCase();
+      return `${fn}.${ln}${intBetween(rng,1,99)}@${pick(rng, WORDLISTS.domains)}`;
+    }
+    case 'phone':
+      return `(${intBetween(rng,200,999)}) ${intBetween(rng,200,999)}-${pad(intBetween(rng,0,9999),4)}`;
+    case 'street':
+      return `${intBetween(rng, 1, 9999)} ${pick(rng, WORDLISTS.streetNames)} ${pick(rng, WORDLISTS.streetTypes)}`;
+    case 'city': return pick(rng, WORDLISTS.cities);
+    case 'state': return pick(rng, WORDLISTS.states);
+    case 'country': return pick(rng, WORDLISTS.countries);
+    case 'zip': return pad(intBetween(rng, 0, 99999), 5);
+    case 'url': return `https://${pick(rng, WORDLISTS.nouns).toLowerCase()}.${pick(rng, WORDLISTS.domains)}`;
+    case 'slug': return `${pick(rng, WORDLISTS.adjectives).toLowerCase()}-${pick(rng, WORDLISTS.nouns).toLowerCase()}-${intBetween(rng,100,999)}`;
+    case 'title': {
+      const n = intBetween(rng, 3, 6);
+      const words = [];
+      for (let i=0;i<n;i++) words.push(pick(rng, [...WORDLISTS.adjectives, ...WORDLISTS.nouns]));
+      return words.join(' ');
+    }
+    case 'paragraph': {
+      const sentCount = intBetween(rng, 2, 4);
+      const sentences = [];
+      for (let s = 0; s < sentCount; s++) {
+        const wc = intBetween(rng, 6, 14);
+        const words = [];
+        for (let w = 0; w < wc; w++) words.push(pick(rng, WORDLISTS.loremWords));
+        const sentence = words.join(' ');
+        sentences.push(sentence.charAt(0).toUpperCase() + sentence.slice(1) + '.');
+      }
+      return sentences.join(' ');
+    }
+    case 'hash':
+      return Array.from({length: 40}, () => Math.floor(rng()*16).toString(16)).join('');
+    case 'status': return pick(rng, WORDLISTS.statuses);
+    case 'code': return Array.from({length: 6}, () => pick(rng, '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split(''))).join('');
+    case 'color': return pick(rng, WORDLISTS.colors);
+    case 'sku': return `${pick(rng, ['SKU','PRD','ITM'])}-${pad(intBetween(rng,1,99999),5)}`;
+    case 'company': return `${pick(rng, WORDLISTS.companies)} ${pick(rng, WORDLISTS.companySuffixes)}`;
+    case 'ip': return `${intBetween(rng,1,255)}.${intBetween(rng,0,255)}.${intBetween(rng,0,255)}.${intBetween(rng,0,255)}`;
+    case 'category': return pick(rng, WORDLISTS.categories);
+    case 'gender': return pick(rng, ['Male','Female','Non-binary','Other']);
+    case 'department': return pick(rng, ['Engineering','Sales','Marketing','Finance','HR','Operations','Support','Legal','Product','Design']);
+    case 'jobTitle': return pick(rng, ['Software Engineer','Product Manager','Sales Associate','Marketing Specialist','Data Analyst','Operations Manager','Account Executive','Designer','HR Coordinator','Financial Analyst']);
+    default: {
+      const n = intBetween(rng, 2, 4);
+      const words = [];
+      for (let i=0;i<n;i++) words.push(pick(rng, WORDLISTS.loremWords));
+      return words.join(' ');
+    }
+  }
+}
+
+// ---------- Main generation routine ----------
+
+function generateData(schema, rowCountsByTable, seed) {
+  const rng = makeRng(seed || 42);
+  const { tables, order } = schema;
+  const generatedRows = {}; // tableName -> array of row objects
+  const pkValuePools = {}; // tableName -> array of PK values generated (for FK selection)
+
+  for (const tableName of order) {
+    const table = tables[tableName];
+    const count = rowCountsByTable[tableName] || 10;
+    const rows = [];
+    const uniqueTrackers = {}; // colName -> Set of used values, for UNIQUE columns
+
+    for (const u of table.uniques) {
+      if (u.length === 1) uniqueTrackers[u[0]] = new Set();
+    }
+    for (const col of table.columns) {
+      if (col.isUnique || col.isPK) uniqueTrackers[col.name] = uniqueTrackers[col.name] || new Set();
+    }
+
+    const selfRefPKs = []; // running list of PKs generated so far in THIS table, for self-referencing FKs
+
+    for (let i = 0; i < count; i++) {
+      const row = {};
+      for (const col of table.columns) {
+        let value;
+
+        if (col.isFK) {
+          const isSelfRef = col.fkRef.table === tableName;
+          const pool = isSelfRef ? selfRefPKs : pkValuePools[col.fkRef.table];
+          const canBeNull = !col.notNull;
+
+          if (pool && pool.length) {
+            if (canBeNull && rng() < 0.05) {
+              value = null;
+            } else {
+              value = pick(rng, pool);
+            }
+          } else if (isSelfRef) {
+            // no prior rows yet in self-referencing table (e.g. first row) - must be null (root of hierarchy)
+            value = canBeNull ? null : null; // can't satisfy NOT NULL self-ref on first row; left null, flagged in UI
+          } else {
+            // referenced table not generated (maybe self-ref or missing) - fall back to int
+            value = col.notNull ? intBetween(rng, 1, count) : (rng() < 0.5 ? null : intBetween(rng, 1, count));
+          }
+        } else {
+          value = generateValue(col, { rng, rowIndex: i, table, allTables: tables, generatedRows });
+        }
+
+        // enforce uniqueness for unique/PK columns by regenerating on collision
+        if ((col.isUnique || col.isPK) && !col.isFK && value !== null) {
+          let attempts = 0;
+          while (uniqueTrackers[col.name] && uniqueTrackers[col.name].has(value) && attempts < 25) {
+            value = generateValue(col, { rng, rowIndex: i + attempts + 1, table, allTables: tables, generatedRows });
+            attempts++;
+          }
+          if (uniqueTrackers[col.name]) uniqueTrackers[col.name].add(value);
+        }
+
+        row[col.name] = value;
+      }
+      rows.push(row);
+      if (table.primaryKey.length === 1 && row[table.primaryKey[0]] !== null && row[table.primaryKey[0]] !== undefined) {
+        selfRefPKs.push(row[table.primaryKey[0]]);
+      }
+    }
+
+    generatedRows[tableName] = rows;
+    if (table.primaryKey.length === 1) {
+      pkValuePools[tableName] = rows.map(r => r[table.primaryKey[0]]).filter(v => v !== null && v !== undefined);
+    } else if (table.primaryKey.length === 0) {
+      // no PK declared - synthesize implicit row index as pool only if some child references this table by name 'id'
+      pkValuePools[tableName] = rows.map((r, idx) => idx + 1);
+    }
+  }
+
+  return generatedRows;
+}
+
+// ---------- Export formatters ----------
+
+function toSQLInsert(tableName, rows, columns) {
+  if (!rows.length) return `-- No rows for ${tableName}\n`;
+  const colNames = columns.map(c => c.name);
+  const lines = [`INSERT INTO ${tableName} (${colNames.join(', ')}) VALUES`];
+  const valueLines = rows.map(row => {
+    const vals = colNames.map(cn => sqlLiteral(row[cn]));
+    return `  (${vals.join(', ')})`;
+  });
+  lines.push(valueLines.join(',\n') + ';');
+  return lines.join('\n');
+}
+
+function sqlLiteral(v) {
+  if (v === null || v === undefined) return 'NULL';
+  if (typeof v === 'boolean') return v ? 'TRUE' : 'FALSE';
+  if (typeof v === 'number') return String(v);
+  if (typeof v === 'string' && /^-?\d+\.\d+$/.test(v)) return v; // decimal literal, unquoted
+  return `'${String(v).replace(/'/g, "''")}'`;
+}
+
+function toCSV(rows, columns) {
+  const colNames = columns.map(c => c.name);
+  const esc = (v) => {
+    if (v === null || v === undefined) return '';
+    const s = String(v);
+    if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+    return s;
+  };
+  const lines = [colNames.join(',')];
+  for (const row of rows) {
+    lines.push(colNames.map(cn => esc(row[cn])).join(','));
+  }
+  return lines.join('\n');
+}
+
+function toJSON(rows) {
+  return JSON.stringify(rows, null, 2);
+}
+
+
+/* ====================== APP LOGIC ====================== */
+/* ====================== APP STATE ====================== */
+let currentSchema = null;
+let currentData = null;
+let currentSeed = 42;
+
+const SAMPLE_SCHEMA = `CREATE TABLE customers (
+  id SERIAL PRIMARY KEY,
+  first_name VARCHAR(50) NOT NULL,
+  last_name VARCHAR(50) NOT NULL,
+  email VARCHAR(255) NOT NULL UNIQUE,
+  phone VARCHAR(20),
+  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+  is_active BOOLEAN DEFAULT TRUE
+);
+
+CREATE TABLE products (
+  id INT PRIMARY KEY AUTO_INCREMENT,
+  sku VARCHAR(30) UNIQUE,
+  name VARCHAR(200) NOT NULL,
+  description TEXT,
+  price DECIMAL(10,2) NOT NULL,
+  stock_quantity INT DEFAULT 0,
+  category VARCHAR(50)
+);
+
+CREATE TABLE orders (
+  order_id INT AUTO_INCREMENT PRIMARY KEY,
+  customer_id INT NOT NULL,
+  order_date DATETIME NOT NULL,
+  total_amount DECIMAL(10,2) NOT NULL,
+  status VARCHAR(20) DEFAULT 'pending',
+  FOREIGN KEY (customer_id) REFERENCES customers(id)
+);
+
+CREATE TABLE order_items (
+  id INT PRIMARY KEY,
+  order_id INT,
+  product_id INT,
+  quantity INT NOT NULL,
+  unit_price DECIMAL(8,2),
+  CONSTRAINT fk_order FOREIGN KEY (order_id) REFERENCES orders(order_id),
+  CONSTRAINT fk_product FOREIGN KEY (product_id) REFERENCES products(id)
+);`;
+
+/* ====================== DOM HELPERS ====================== */
+const $ = (sel) => document.querySelector(sel);
+const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+
+function showToast(msg) {
+  const t = $('#toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+function showError(msg) {
+  const box = $('#error-box');
+  box.textContent = msg;
+  box.style.display = 'block';
+}
+function hideError() {
+  $('#error-box').style.display = 'none';
+}
+
+/* ====================== TAB SWITCHING ====================== */
+$$('.input-tab').forEach(tab => {
+  tab.addEventListener('click', () => {
+    $$('.input-tab').forEach(t => t.classList.remove('active'));
+    tab.classList.add('active');
+    const which = tab.dataset.tab;
+    $('#tab-paste').style.display = which === 'paste' ? 'block' : 'none';
+    $('#tab-upload').style.display = which === 'upload' ? 'block' : 'none';
+  });
+});
+
+/* ====================== FILE UPLOAD ====================== */
+const dropzone = $('#dropzone');
+const fileInput = $('#file-input');
+
+dropzone.addEventListener('dragover', (e) => { e.preventDefault(); dropzone.classList.add('dragover'); });
+dropzone.addEventListener('dragleave', () => dropzone.classList.remove('dragover'));
+dropzone.addEventListener('drop', (e) => {
+  e.preventDefault();
+  dropzone.classList.remove('dragover');
+  const file = e.dataTransfer.files[0];
+  if (file) readFile(file);
+});
+fileInput.addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if (file) readFile(file);
+});
+
+function readFile(file) {
+  const reader = new FileReader();
+  reader.onload = () => {
+    $('#schema-input').value = reader.result;
+    // switch to paste tab so they can see/edit what was loaded
+    $$('.input-tab').forEach(t => t.classList.remove('active'));
+    $('.input-tab[data-tab="paste"]').classList.add('active');
+    $('#tab-paste').style.display = 'block';
+    $('#tab-upload').style.display = 'none';
+    showToast('File loaded — review and parse');
+  };
+  reader.readAsText(file);
+}
+
+/* ====================== SAMPLE / CLEAR ====================== */
+$('#sample-link').addEventListener('click', () => {
+  $('#schema-input').value = SAMPLE_SCHEMA;
+  hideError();
+  showToast('Sample schema loaded');
+});
+
+$('#clear-btn').addEventListener('click', () => {
+  $('#schema-input').value = '';
+  hideError();
+  resetDownstream();
+});
+
+function resetDownstream() {
+  currentSchema = null;
+  currentData = null;
+  $('#schema-map-section').style.display = 'none';
+  $('#counts-section').style.display = 'none';
+  $('#output-section').style.display = 'none';
+  $('#reroll-link').style.display = 'none';
+  $('#run-meta').textContent = 'no schema loaded';
+}
+
+/* ====================== PARSE SCHEMA ====================== */
+$('#parse-btn').addEventListener('click', () => {
+  const sql = $('#schema-input').value.trim();
+  hideError();
+
+  if (!sql) {
+    showError('Paste or upload a schema first — at least one CREATE TABLE statement.');
+    return;
+  }
+
+  let schema;
+  try {
+    schema = parseSchema(sql);
+  } catch (e) {
+    showError('Could not parse this schema: ' + e.message);
+    return;
+  }
+
+  const tableNames = Object.keys(schema.tables);
+  if (tableNames.length === 0) {
+    showError('No CREATE TABLE statements found. Check the SQL and try again — table definitions should look like "CREATE TABLE name (...)".');
+    return;
+  }
+
+  currentSchema = schema;
+  renderSchemaMap(schema);
+  renderCountInputs(schema);
+  $('#schema-map-section').style.display = 'block';
+  $('#counts-section').style.display = 'block';
+  $('#output-section').style.display = 'none';
+  $('#reroll-link').style.display = 'none';
+
+  const totalCols = tableNames.reduce((sum, t) => sum + schema.tables[t].columns.length, 0);
+  const totalFks = tableNames.reduce((sum, t) => sum + schema.tables[t].foreignKeys.length, 0);
+  $('#run-meta').textContent = `${tableNames.length} table${tableNames.length !== 1 ? 's' : ''} · ${totalCols} columns · ${totalFks} relationship${totalFks !== 1 ? 's' : ''}`;
+
+  $('#schema-map-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+/* ====================== RENDER SCHEMA MAP ====================== */
+function typeLabel(col) {
+  let base = col.rawType;
+  if (col.typeArgs && col.typeArgs.length) base += '(' + col.typeArgs.join(',') + ')';
+  return base;
+}
+
+function renderSchemaMap(schema) {
+  const grid = $('#table-grid');
+  grid.innerHTML = '';
+
+  for (const tableName of schema.order) {
+    const table = schema.tables[tableName];
+    const card = document.createElement('div');
+    card.className = 'table-card';
+
+    const head = document.createElement('div');
+    head.className = 'table-card-head';
+    head.innerHTML = `<span class="name">${escapeHtml(tableName)}</span><span class="count">${table.columns.length} cols${table.foreignKeys.length ? ' · ' + table.foreignKeys.length + ' fk' : ''}</span>`;
+    card.appendChild(head);
+
+    const list = document.createElement('div');
+    list.className = 'col-list';
+    for (const col of table.columns) {
+      const row = document.createElement('div');
+      row.className = 'col-row';
+      let badges = '';
+      if (col.isPK) badges += '<span class="badge badge-pk">PK</span>';
+      if (col.isFK) badges += `<span class="badge badge-fk">FK→${escapeHtml(col.fkRef.table)}</span>`;
+      row.innerHTML = `<span class="col-name">${escapeHtml(col.name)}</span>${badges}<span class="col-type">${escapeHtml(typeLabel(col))}</span>`;
+      list.appendChild(row);
+    }
+    card.appendChild(list);
+    grid.appendChild(card);
+  }
+
+  $('#schema-summary').textContent = `${schema.order.length} table${schema.order.length !== 1 ? 's' : ''} parsed, generation order resolved`;
+}
+
+function escapeHtml(s) {
+  return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ====================== ROW COUNT INPUTS ====================== */
+function renderCountInputs(schema) {
+  const grid = $('#count-grid');
+  grid.innerHTML = '';
+  for (const tableName of schema.order) {
+    const card = document.createElement('div');
+    card.className = 'count-card';
+    card.innerHTML = `
+      <span class="label">${escapeHtml(tableName)}</span>
+      <input type="number" min="0" max="5000" value="${defaultRowCount(tableName)}" data-table="${escapeHtml(tableName)}" class="row-count-input">
+    `;
+    grid.appendChild(card);
+  }
+}
+
+function defaultRowCount(tableName) {
+  // child tables (with FKs) often want more rows than parents - small heuristic default
+  const table = currentSchema.tables[tableName];
+  return table.foreignKeys.length > 0 ? 20 : 10;
+}
+
+/* ====================== GENERATE ====================== */
+$('#generate-btn').addEventListener('click', () => {
+  if (!currentSchema) return;
+  const counts = {};
+  $$('.row-count-input').forEach(input => {
+    const n = parseInt(input.value, 10);
+    counts[input.dataset.table] = isNaN(n) ? 10 : Math.max(0, Math.min(5000, n));
+  });
+
+  currentSeed = parseInt($('#seed-input').value, 10) || 42;
+
+  try {
+    currentData = generateData(currentSchema, counts, currentSeed);
+  } catch (e) {
+    showError('Generation failed: ' + e.message);
+    return;
+  }
+
+  renderOutput(currentSchema, currentData);
+  $('#output-section').style.display = 'block';
+  $('#reroll-link').style.display = 'inline';
+  $('#output-section').scrollIntoView({ behavior: 'smooth', block: 'start' });
+});
+
+$('#reroll-link').addEventListener('click', () => {
+  $('#seed-input').value = Math.floor(Math.random() * 100000);
+  $('#generate-btn').click();
+});
+
+/* ====================== RENDER OUTPUT ====================== */
+let activeFormat = 'table';
+
+$$('.format-pill').forEach(pill => {
+  pill.addEventListener('click', () => {
+    $$('.format-pill').forEach(p => p.classList.remove('active'));
+    pill.classList.add('active');
+    activeFormat = pill.dataset.format;
+    if (currentData) renderOutput(currentSchema, currentData);
+  });
+});
+
+function renderOutput(schema, data) {
+  const container = $('#output-tables');
+  container.innerHTML = '';
+
+  const totalRows = Object.values(data).reduce((sum, rows) => sum + rows.length, 0);
+  $('#output-summary').textContent = `${totalRows} rows generated · seed ${currentSeed}`;
+
+  for (const tableName of schema.order) {
+    const table = schema.tables[tableName];
+    const rows = data[tableName];
+
+    const block = document.createElement('div');
+    block.className = 'output-table-block';
+
+    const head = document.createElement('div');
+    head.className = 'output-table-head';
+    head.innerHTML = `<span class="name">${escapeHtml(tableName)}</span><span class="meta">${rows.length} rows</span>`;
+    const copyBtn = document.createElement('button');
+    copyBtn.className = 'copy-btn';
+    copyBtn.textContent = 'Copy';
+    copyBtn.addEventListener('click', () => copyTableOutput(tableName, table, rows));
+    head.appendChild(copyBtn);
+    block.appendChild(head);
+
+    const body = document.createElement('div');
+    body.className = 'table-scroll';
+
+    if (activeFormat === 'table') {
+      body.appendChild(renderPreviewTable(table, rows));
+    } else {
+      const pre = document.createElement('pre');
+      pre.className = 'code-output';
+      pre.textContent = formatOutput(activeFormat, tableName, table, rows);
+      body.appendChild(pre);
+    }
+
+    block.appendChild(body);
+    container.appendChild(block);
+  }
+
+  const exportRow = document.createElement('div');
+  exportRow.className = 'export-row';
+  exportRow.innerHTML = `
+    <button class="btn btn-primary" id="dl-sql">Download all as .sql</button>
+    <button class="btn btn-ghost" id="dl-json">Download all as .json</button>
+    <button class="btn btn-ghost" id="dl-csv">Download CSVs (one per table)</button>
+  `;
+  container.appendChild(exportRow);
+
+  $('#dl-sql').addEventListener('click', downloadAllSQL);
+  $('#dl-json').addEventListener('click', downloadAllJSON);
+  $('#dl-csv').addEventListener('click', downloadAllCSV);
+}
+
+function renderPreviewTable(table, rows) {
+  const el = document.createElement('table');
+  el.className = 'data-preview';
+
+  if (rows.length > 100) {
+    const caption = document.createElement('caption');
+    caption.style.cssText = 'text-align:left;padding:8px 12px;font-family:var(--mono);font-size:11px;color:var(--gray-2);caption-side:bottom;';
+    caption.textContent = `showing first 100 of ${rows.length} rows — full data included in exports`;
+    el.appendChild(caption);
+  }
+
+  const thead = document.createElement('thead');
+  const headRow = document.createElement('tr');
+  for (const col of table.columns) {
+    const th = document.createElement('th');
+    th.textContent = col.name;
+    if (col.isPK) th.classList.add('is-pk');
+    if (col.isFK) th.classList.add('is-fk');
+    headRow.appendChild(th);
+  }
+  thead.appendChild(headRow);
+  el.appendChild(thead);
+
+  const tbody = document.createElement('tbody');
+  const previewRows = rows.slice(0, 100); // cap preview render for perf; full data still exported
+  for (const row of previewRows) {
+    const tr = document.createElement('tr');
+    for (const col of table.columns) {
+      const td = document.createElement('td');
+      const val = row[col.name];
+      if (val === null || val === undefined) {
+        td.textContent = 'NULL';
+        td.classList.add('is-null');
+      } else {
+        td.textContent = String(val);
+      }
+      if (col.isPK) td.classList.add('is-pk');
+      if (col.isFK) td.classList.add('is-fk');
+      tr.appendChild(td);
+    }
+    tbody.appendChild(tr);
+  }
+  el.appendChild(tbody);
+
+  return el;
+}
+
+function formatOutput(format, tableName, table, rows) {
+  if (format === 'sql') return toSQLInsert(tableName, rows, table.columns);
+  if (format === 'json') return toJSON(rows);
+  if (format === 'csv') return toCSV(rows, table.columns);
+  return '';
+}
+
+/* ====================== COPY / DOWNLOAD ====================== */
+function copyTableOutput(tableName, table, rows) {
+  const text = formatOutput(activeFormat === 'table' ? 'sql' : activeFormat, tableName, table, rows);
+  navigator.clipboard.writeText(text).then(() => showToast(`Copied ${tableName}`));
+}
+
+function triggerDownload(filename, content, mime) {
+  const blob = new Blob([content], { type: mime || 'text/plain' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+function downloadAllSQL() {
+  let out = '-- generated fake data — seed: ' + currentSeed + '\n\n';
+  for (const tableName of currentSchema.order) {
+    out += toSQLInsert(tableName, currentData[tableName], currentSchema.tables[tableName].columns) + '\n\n';
+  }
+  triggerDownload('fake_data.sql', out, 'text/plain');
+  showToast('Downloaded fake_data.sql');
+}
+
+function downloadAllJSON() {
+  const combined = {};
+  for (const tableName of currentSchema.order) combined[tableName] = currentData[tableName];
+  triggerDownload('fake_data.json', JSON.stringify(combined, null, 2), 'application/json');
+  showToast('Downloaded fake_data.json');
+}
+
+function downloadAllCSV() {
+  for (const tableName of currentSchema.order) {
+    const csv = toCSV(currentData[tableName], currentSchema.tables[tableName].columns);
+    triggerDownload(`${tableName}.csv`, csv, 'text/csv');
+  }
+  showToast('Downloaded CSV per table');
+}
+
+</script>
+</body>
+</html>

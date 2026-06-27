@@ -1,0 +1,17 @@
+{
+  "name": "schema-introspector",
+  "version": "1.0.0",
+  "description": "Local-only backend that connects to a Postgres/MySQL/SQLite database and returns schema metadata in the shape the fake-data-generator frontend expects.",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.19.2",
+    "cors": "^2.8.5",
+    "pg": "^8.12.0",
+    "mysql2": "^3.11.0"
+  }
+}
